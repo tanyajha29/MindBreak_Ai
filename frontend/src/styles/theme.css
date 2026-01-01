@@ -1,0 +1,7 @@
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: rgba(255,255,255,0.05);
+  --accent: linear-gradient(135deg,#6366f1,#8b5cf6);
+  --text-primary: #e5e7eb;
+  --glass-border: rgba(255,255,255,0.1);
+}
