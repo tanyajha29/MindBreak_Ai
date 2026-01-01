@@ -1,19 +1,23 @@
-const pool = require("../config/db");
-const { calculateScore } = require("../utils/productivity");
+const runAI = require("../ai/aiEngine");
 
-exports.aiInsights = async (req, res) => {
-  const tasks = await pool.query(
-    "SELECT * FROM tasks WHERE user_id=$1",
-    [req.user.id]
-  );
+const handleAI = async (req, res) => {
+  try {
+    const { message } = req.body;
 
-  const score = calculateScore(tasks.rows);
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
 
-  res.json({
-    productivityScore: score,
-    suggestion:
-      score < 50
-        ? "Focus on high-priority tasks first"
-        : "Great job! Maintain momentum"
-  });
+    const result = await runAI(message);
+
+    res.json({
+      success: true,
+      response: result
+    });
+  } catch (err) {
+    console.error("AI ERROR:", err.message);
+    res.status(500).json({ error: "AI failed", details: err.message });
+  }
 };
+
+module.exports = { handleAI };

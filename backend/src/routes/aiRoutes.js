@@ -1,7 +1,8 @@
-const router = require("express").Router();
-const { protect } = require("../middleware/authMiddleware");
-const { aiInsights } = require("../controllers/aiController");
+const express = require("express");
+const { aiHandler, handleAI } = require("../controllers/aiController");
 
-router.get("/insights", protect, aiInsights);
+const router = express.Router();
+
+router.post("/", handleAI);
 
 module.exports = router;

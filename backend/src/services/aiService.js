@@ -1,10 +1,27 @@
-export const recommendTask = (tasks) => {
-  const priorityWeight = { High: 3, Medium: 2, Low: 1 };
+import fetch from "node-fetch";
+import { productivityPrompt } from "../ai/prompts.js";
 
-  return tasks
-    .filter(t => t.status !== "Completed")
-    .sort((a, b) =>
-      priorityWeight[b.priority] - priorityWeight[a.priority] ||
-      new Date(a.deadline) - new Date(b.deadline)
-    )[0];
+const OLLAMA_URL = process.env.OLLAMA_BASE_URL;
+const MODEL = process.env.OLLAMA_MODEL;
+
+export const runProductivityAI = async (task) => {
+  const prompt = productivityPrompt(task);
+
+  const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: MODEL,
+      prompt,
+      stream: false
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  }
+
+  const data = await response.json();
+  return JSON.parse(data.response);
 };
