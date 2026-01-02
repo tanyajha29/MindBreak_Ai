@@ -1,8 +1,6 @@
-const express = require("express");
-const { aiHandler, handleAI } = require("../controllers/aiController");
+const router = require("express").Router();
+const { handleTaskAI } = require("../controllers/aiController");
 
-const router = express.Router();
-
-router.post("/", handleAI);
+router.post("/task", handleTaskAI);
 
 module.exports = router;

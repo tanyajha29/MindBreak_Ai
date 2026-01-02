@@ -1,23 +1,38 @@
-const runAI = require("../ai/aiEngine");
+const { analyzeTask } = require("../ai/rules");
+const { productivityPrompt } = require("../ai/prompts");
+const { callOllama } = require("../ai/ollamaClient");
 
-const handleAI = async (req, res) => {
+const handleTaskAI = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { task } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+    if (!task) {
+      return res.status(400).json({ error: "Task is required" });
     }
 
-    const result = await runAI(message);
+    // 1️⃣ Rule-based analysis
+    const analysis = analyzeTask(task);
+
+    // 2️⃣ Build prompt
+    const prompt = productivityPrompt({
+      task,
+      ...analysis
+    });
+
+    // 3️⃣ Call Ollama
+    const aiResponse = await callOllama(prompt);
 
     res.json({
       success: true,
-      response: result
+      data: JSON.parse(aiResponse)
     });
   } catch (err) {
-    console.error("AI ERROR:", err.message);
-    res.status(500).json({ error: "AI failed", details: err.message });
+    console.error(err);
+    res.status(500).json({
+      error: "AI failed",
+      details: err.message
+    });
   }
 };
 
-module.exports = { handleAI };
+module.exports = { handleTaskAI };
