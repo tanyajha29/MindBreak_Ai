@@ -13,6 +13,15 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: daybreak_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
   backend:
     build:
       context: ..
@@ -29,14 +38,17 @@ services:
       - ../backend:/app
     command: npm run dev
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: daybreak_ollama
-    restart: unless-stopped
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    container_name: daybreak_frontend
     ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_BASE_URL=http://backend:5000
 
 volumes:
   pgdata:
