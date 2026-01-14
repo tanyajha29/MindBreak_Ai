@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/layout/Navbar";
 import { registerUser } from "../api/auth.api";
 import { saveAuth } from "../api/auth";
 

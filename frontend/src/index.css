@@ -1,6 +1,36 @@
 @import "tailwindcss";
 
+@theme {
+  /* Define your custom colors here */
+  --color-dark-900: #0a0a0f;
+  --color-dark-800: #13131a;
+  --color-dark-700: #1c1c26;
+  
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  
+  --color-accent-500: #ec4899;
+}
 
-body {
-  @apply bg-white text-gray-900;
+/* Global Styles */
+@layer base {
+  body {
+    @apply bg-dark-900 text-gray-200 antialiased overflow-x-hidden;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Custom Scrollbar (Optional but recommended for the UI) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c1c26;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #27272a;
 }
