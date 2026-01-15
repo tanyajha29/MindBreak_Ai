@@ -12,6 +12,7 @@ import NotFound from "../pages/NotFound";
 import Dashboard from "../pages/Dashboard";
 import Insights from "../pages/Insights";
 import TasksPage from "../pages/Tasks"; 
+import SettingsPage from "../pages/Settings";
 
 // Guard Component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -35,7 +36,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<DashboardWrapper />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/tasks" element={<TasksPage />} />
-     
+        <Route path="/settings" element={<SettingsPage />} />
 
       {/* --- 404 --- */}
       <Route path="*" element={<NotFound />} />
