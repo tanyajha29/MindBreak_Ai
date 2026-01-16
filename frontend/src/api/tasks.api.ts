@@ -1,12 +1,34 @@
-import api from "./base";
+import api from "./api";
 
-export const fetchTasks = () => api.get("/tasks");
+export type Priority = "Low" | "Medium" | "High";
+export type Status = "Pending" | "Completed";
 
-export const createTask = (data: any) =>
-  api.post("/tasks", data);
+export type Task = {
+  id: number;
+  title: string;
+  description?: string;
+  priority: Priority;
+  status: Status;
+  dueDate?: string;
+};
 
-export const updateTask = (id: string, data: any) =>
-  api.put(`/tasks/${id}`, data);
+/* Fetch all tasks */
+export const getTasks = () => api.get<Task[]>("/api/tasks");
 
-export const deleteTask = (id: string) =>
-  api.delete(`/tasks/${id}`);
+/* Create task */
+export const createTask = (data: {
+  title: string;
+  description?: string;
+  priority: string;
+  dueDate?: string;
+}) =>
+  api.post<Task>("/api/tasks", {
+    ...data,
+    status: "pending",
+  });
+
+/* Update task status */
+export const updateTaskStatus = (id: number, status: Status) =>
+  api.patch(`/api/tasks/${id}`, {
+    status: status.toLowerCase(),
+  });

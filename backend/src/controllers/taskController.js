@@ -28,7 +28,32 @@ const getTasks = async (req, res) => {
   res.json(result.rows);
 };
 
+const updateTaskStatus = async (req, res) => {
+  const { id } = req.params;      // ✅ THIS WAS MISSING
+  const { status } = req.body;
+
+ 
+  if (!status) {
+    return res.status(400).json({ error: "Status is required" });
+  }
+
+  const result = await pool.query(
+    `UPDATE tasks
+     SET status = $1
+     WHERE id = $2 AND user_id = $3
+     RETURNING *`,
+    [status, id, req.user.id]
+  );
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  res.json(result.rows[0]);
+};
+
 module.exports = {
   createTask,
-  getTasks
+  getTasks,
+  updateTaskStatus
 };

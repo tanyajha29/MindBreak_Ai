@@ -2,16 +2,18 @@ const router = require("express").Router();
 const { protect } = require("../middleware/authMiddleware");
 const {
   createTask,
-  getTasks
+  getTasks,
+  updateTaskStatus
 } = require("../controllers/taskController");
-console.log("🔥 taskRoutes FILE LOADED");
+
 
 
 router.post("/", protect, (req, res, next) => {
-  console.log("🔥 POST /api/tasks HIT");
+  
   next();
 }, createTask);
 
+router.patch("/:id", protect, updateTaskStatus);
 router.get("/", protect, getTasks);
 
 module.exports = router;

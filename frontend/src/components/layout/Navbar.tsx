@@ -23,7 +23,7 @@ export default function Navbar() {
             ⚡
           </div>
           <span className="text-lg font-semibold text-white">
-            DayBreak
+            MindBreak AI
           </span>
         </Link>
 

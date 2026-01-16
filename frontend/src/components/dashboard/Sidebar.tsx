@@ -1,11 +1,12 @@
-import { NavLink } from "react-router-dom";
+import {Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const menuItems = [
+  
   { name: "Dashboard", path: "/dashboard" },
   { name: "Tasks", path: "/tasks" },
   { name: "Insights", path: "/insights" },
-  { name: "Notifications", path: "/notifications" },
+
   { name: "Settings", path: "/settings" },
 ];
 
@@ -18,14 +19,16 @@ export function Sidebar() {
       className="fixed left-0 top-0 h-screen w-60 bg-[#0b0f1a] border-r border-white/10 text-white flex flex-col"
     >
       {/* Logo */}
-      <div className="h-20 flex items-center px-6 text-2xl font-bold tracking-wide">
+      <Link to="/">
+      <div className="h-25 flex items-center px-6 text-2xl font-bold tracking-wide">
         <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-          DayBreak
+          MindBreak AI
         </span>
       </div>
+      </Link>
 
       {/* Menu */}
-      <nav className="px-3 space-y-1">
+      <nav className="px-3 space-y-3">
         {menuItems.map((item, index) => (
           <NavLink
             key={item.name}
