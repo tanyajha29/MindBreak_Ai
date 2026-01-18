@@ -1,7 +1,5 @@
-import axios from "axios";
+// api/insights.api.ts
+import api from "./api";
 
-export function getInsights(range: "day" | "week" | "month") {
-  return axios.get("/api/insights", {
-    params: { range },
-  });
-}
+export const getInsights = (range: "day" | "week" | "month") =>
+  api.get(`api/insights?range=${range}`);

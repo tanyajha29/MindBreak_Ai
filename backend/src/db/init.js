@@ -13,10 +13,42 @@ const initDB = async () => {
       );
     `);
 
+    await pool.query(`CREATE OR REPLACE FUNCTION get_task_insights(
+  p_user_id INT,
+  p_range TEXT
+)
+RETURNS JSON AS $$
+DECLARE
+  start_date DATE;
+  result JSON;
+BEGIN
+  IF p_range = 'day' THEN
+    start_date := CURRENT_DATE;
+  ELSIF p_range = 'week' THEN
+    start_date := CURRENT_DATE - INTERVAL '6 days';
+  ELSE
+    start_date := CURRENT_DATE - INTERVAL '29 days';
+  END IF;
+
+  SELECT json_build_object(
+    'completed', COUNT(*) FILTER (WHERE status = 'completed'),
+    'pending', COUNT(*) FILTER (WHERE status != 'completed'),
+    'total', COUNT(*)
+  )
+  INTO result
+  FROM tasks
+  WHERE user_id = p_user_id
+    AND created_at::date >= start_date;
+
+  RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+    `);
+
     await pool.query(`
      CREATE TABLE IF NOT EXISTS tasks (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+     id SERIAL PRIMARY KEY,
+     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
 
   title VARCHAR(200) NOT NULL,
   description TEXT,

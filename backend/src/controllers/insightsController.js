@@ -1,37 +1,25 @@
-exports.getInsights = async (req, res) => {
-  const { range = "week" } = req.query;
-  const userId = req.user.id;
+const { getInsights } = require("../services/insights.services");
 
-  // TODO: replace with DB aggregation
-  res.json({
-    stats: {
-      completedTasks: 32,
-      focusTimeMinutes: 1260,
-      productivityScore: 84,
-    },
-    charts: {
-      productivityTrend: [
-        { label: "Mon", value: 62 },
-        { label: "Tue", value: 68 },
-        { label: "Wed", value: 74 },
-        { label: "Thu", value: 80 },
-        { label: "Fri", value: 84 },
-      ],
-      taskCompletion: [
-        { label: "Mon", value: 4 },
-        { label: "Tue", value: 6 },
-        { label: "Wed", value: 5 },
-        { label: "Thu", value: 7 },
-        { label: "Fri", value: 10 },
-      ],
-    },
-    aiInsights: [
-      "Your productivity peaks on Thursdays.",
-      "You complete more tasks when deadlines are set.",
-    ],
-    focusSuggestions: [
-      "Schedule deep work between 10–12 AM.",
-      "Avoid task switching in the afternoon.",
-    ],
-  });
+exports.getInsights = async (req, res, next) => {
+  try {
+    const userId = req.user.id; // from auth middleware
+    const range = req.query.range || "week";
+
+    const data = await getInsights(userId, range);
+
+    // AI-style insights (rule-based)
+    const aiInsights = [];
+    if (data.kpis.completed > data.kpis.pending) {
+      aiInsights.push("🔥 Great job! You're completing more tasks than pending.");
+    } else {
+      aiInsights.push("⚠️ You have pending tasks. Try prioritizing today’s tasks.");
+    }
+
+    res.json({
+      ...data,
+      aiInsights,
+    });
+  } catch (err) {
+    next(err);
+  }
 };

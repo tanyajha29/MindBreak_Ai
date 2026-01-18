@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { getInsights } = require("../controllers/insightsController");
-const auth = require("../middleware/auth");
+const { protect } = require("../middleware/authMiddleware");
 
-router.get("/", auth, getInsights);
+router.get("/", protect, getInsights);
 
 module.exports = router;
