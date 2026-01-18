@@ -2,7 +2,25 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DashboardLayout } from "../components/dashboard/DashboardLayout";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import {
+  LineChart as ReLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import {
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  LineChart,
+  BarChart3,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { getInsights } from "../api/insights.api";
 
 /* ---------------- TYPES ---------------- */
@@ -36,7 +54,6 @@ export default function InsightsPage() {
     try {
       setLoading(true);
       setError(null);
-
       const res = await getInsights(range);
       setData(res.data);
     } catch (err) {
@@ -55,7 +72,12 @@ export default function InsightsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-10">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="space-y-10"
+      >
         {/* HEADER */}
         <div>
           <h1 className="text-2xl font-semibold text-white">Insights</h1>
@@ -65,22 +87,34 @@ export default function InsightsPage() {
         {/* RANGE FILTER */}
         <div className="flex gap-3">
           {(["day", "week", "month"] as Range[]).map((r) => (
-            <button
+            <motion.button
               key={r}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setRange(r)}
-              className={`px-4 py-2 rounded-xl text-sm ${
-                range === r
-                  ? "bg-purple-500 text-white"
-                  : "bg-white/5 text-gray-400 hover:text-white"
-              }`}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition
+                ${
+                  range === r
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
+                    : "bg-white/5 text-gray-400 hover:text-white"
+                }`}
             >
               {r.toUpperCase()}
-            </button>
+            </motion.button>
           ))}
         </div>
 
-        {/* LOADING / ERROR */}
-        {loading && <p className="text-gray-400 text-sm">Loading insights…</p>}
+        {/* STATES */}
+        {loading && (
+          <motion.p
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="text-gray-400 text-sm"
+          >
+            Loading insights…
+          </motion.p>
+        )}
+
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
         {/* CONTENT */}
@@ -88,87 +122,161 @@ export default function InsightsPage() {
           <>
             {/* KPI CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <KpiCard label="Tasks Done" value={data.kpis.completed} />
-              <KpiCard label="Pending Tasks" value={data.kpis.pending} />
-              <KpiCard label="Productivity Score" value={`${productivityScore}%`} />
+              <KpiCard
+                label="Tasks Done"
+                value={data.kpis.completed}
+                icon={CheckCircle}
+                iconColor="text-green-400"
+              />
+              <KpiCard
+                label="Pending Tasks"
+                value={data.kpis.pending}
+                icon={Clock}
+                iconColor="text-yellow-400"
+              />
+              <KpiCard
+                label="Productivity Score"
+                value={`${productivityScore}%`}
+                icon={TrendingUp}
+                highlight
+              />
             </div>
 
             {/* CHARTS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ChartCard title="Productivity Trend">
+              <ChartCard title="Productivity Trend" icon={LineChart}>
                 <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={data.productivity}>
+                  <ReLineChart data={data.productivity}>
                     <XAxis dataKey="day" stroke="#9ca3af" />
                     <YAxis stroke="#9ca3af" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="completed" stroke="#a855f7" strokeWidth={3} />
-                  </LineChart>
+                    <Line
+                      type="monotone"
+                      dataKey="completed"
+                      stroke="#a855f7"
+                      strokeWidth={3}
+                    />
+                  </ReLineChart>
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Task Completion">
+              <ChartCard title="Task Completion" icon={BarChart3}>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={data.productivity}>
                     <XAxis dataKey="day" stroke="#9ca3af" />
                     <YAxis stroke="#9ca3af" />
                     <Tooltip />
-                    <Bar dataKey="completed" fill="#ec4899" />
+                    <Bar
+                      dataKey="completed"
+                      fill="#ec4899"
+                      radius={[8, 8, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
             </div>
 
-            {/* AI INSIGHTS */}
+            {/* AI + FOCUS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card title="AI Insights">
+              <Card title="AI Insights" icon={Sparkles}>
                 {data.aiInsights.length === 0 ? (
                   <p className="text-sm text-gray-400">No insights yet</p>
                 ) : (
                   data.aiInsights.map((text, i) => (
-                    <p key={i} className="text-sm text-purple-300">{text}</p>
+                    <p key={i} className="text-sm text-purple-300">
+                      • {text}
+                    </p>
                   ))
                 )}
               </Card>
 
-              <Card title="Focus Suggestions">
+              <Card title="Focus Suggestions" icon={Target}>
                 <ul className="list-disc list-inside text-sm text-gray-400 space-y-1">
                   <li>Focus on pending tasks first</li>
-                  <li>Complete high‑priority tasks early</li>
+                  <li>Complete high-priority tasks early</li>
                   <li>Avoid overloading your day</li>
                 </ul>
               </Card>
             </div>
           </>
         )}
-      </div>
+      </motion.div>
     </DashboardLayout>
   );
 }
 
 /* ---------------- UI COMPONENTS ---------------- */
 
-function KpiCard({ label, value }: { label: string; value: any }) {
+function KpiCard({
+  label,
+  value,
+  icon: Icon,
+  iconColor = "text-purple-400",
+  highlight = false,
+}: {
+  label: string;
+  value: any;
+  icon: any;
+  iconColor?: string;
+  highlight?: boolean;
+}) {
   return (
-    <motion.div whileHover={{ y: -6 }} className="bg-[#0f172a] border border-white/10 rounded-2xl p-5">
-      <p className="text-sm text-gray-400">{label}</p>
+    <motion.div
+      whileHover={{ y: -8, scale: 1.02 }}
+      className={`relative rounded-2xl p-5 border bg-[#0f172a]
+        ${
+          highlight
+            ? "border-purple-500/40 shadow-lg shadow-purple-500/30"
+            : "border-white/10"
+        }`}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-400">{label}</p>
+        <Icon className={`w-6 h-6 ${iconColor}`} />
+      </div>
       <p className="text-2xl font-semibold text-white mt-2">{value}</p>
     </motion.div>
   );
 }
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ChartCard({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: any;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-4">
-      <p className="text-sm text-gray-400 mb-2">{title}</p>
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      className="bg-[#0f172a] border border-white/10 rounded-2xl p-4"
+    >
+      <div className="flex items-center gap-2 mb-2 text-gray-400">
+        <Icon className="w-4 h-4 text-purple-400" />
+        <p className="text-sm">{title}</p>
+      </div>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: any;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-5 space-y-2">
-      <h3 className="text-sm text-gray-400">{title}</h3>
+      <div className="flex items-center gap-2 text-gray-400">
+        <Icon className="w-4 h-4 text-purple-400" />
+        <h3 className="text-sm">{title}</h3>
+      </div>
       {children}
     </div>
   );
