@@ -19,6 +19,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/insights", require("./routes/insights.routes"));
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
+
 app.get("/", (req, res) => {
   res.send("🚀 DayBreak API Running");
 });
