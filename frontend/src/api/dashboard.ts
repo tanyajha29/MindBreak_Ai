@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+// src/api/dashboard.ts
 
 export interface DashboardData {
   stats: {
@@ -18,31 +18,24 @@ export interface DashboardData {
   };
 }
 
-export function useDashboard() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+export async function fetchDashboard(): Promise<DashboardData> {
+  const token = localStorage.getItem("Token");
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
-
-  async function fetchDashboard() {
-    try {
-      const res = await fetch("/api/dashboard", {
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const json = await res.json();
-      setData(json);
-    } catch {
-      setError("Failed to load dashboard");
-    } finally {
-      setLoading(false);
-    }
+  if (!token) {
+    throw new Error("No auth token found");
   }
 
-  return { data, loading, error };
+  const res = await fetch("http://localhost:5000/api/dashboard", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ CORRECT
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Dashboard fetch failed: ${res.status}`);
+  }
+
+  return res.json();
 }
